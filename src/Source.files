@@ -1,0 +1,6 @@
+
+# Makefile include defining variable SRCS containing list of all source files
+
+SRCS := \
+  navigation/kalman_filter.cpp \
+  navigation/main.cpp \
