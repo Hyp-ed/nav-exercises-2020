@@ -1,0 +1,33 @@
+Quick Kalman filtering cheat sheet:
+
+Dimensions:
+    n : dimension of state vector
+    m : dimension of measurement vector
+    k : dimension of control vector
+
+Equations:
+Prediction:
+    x = Ax + Bu
+    P = APA^(T) + Q
+Calculation:
+    K = PH^(T) * (HPH^(T) + R)^(-1)
+Estimation:
+    x = x + K(z - Hx)
+    P = (I - KH)P
+
+Note that subscripts are not available in this format. 
+If you want a more thorough overview of the equations, 
+check the navigation folder on the drive.
+
+Symbols:    Description:                    Dimensions:
+    x       state vector                    n x 1
+    z       measurement vector              m x 1
+    u       control vector                  k x 1
+    A       state transition matrix         n x n
+    B       control matrix                  n x k
+    P       state covariance matrix         n x n
+    Q       state covariance noise matrix   n x n
+    K       kalman gain matrix              n x m
+    H       dimension change matrix         m x n
+    R       measurement noise matrix        m x m
+    I       identity matrix                 n x n
