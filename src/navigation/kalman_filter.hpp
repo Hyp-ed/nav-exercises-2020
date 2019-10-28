@@ -3,6 +3,7 @@
 #include <iostream>
 #include <Eigen/Dense>
 
+//!!! General comment: fewer return statements, work more with member variables
 using Eigen::VectorXf;
 using Eigen::MatrixXf;
 
@@ -21,13 +22,13 @@ using Eigen::MatrixXf;
       // f8 : get_state
       // f9 : get_covariance
 
-      void set_initial(VectorXf init);
+      void set_initial(VectorXf init);  //! Add initial covariance matrix
 
       VectorXf get_state();
 
       MatrixXf get_covariance();
 
-      void filter();
+      void filter();  //!! Two variables missing, update this! (real life values)
 
     private:
       // f1 : predict state
@@ -42,7 +43,7 @@ using Eigen::MatrixXf;
       // f5 : estimate state covariance
       MatrixXf estimate_covariance(MatrixXf K);
       // f10 : update state transition;
-      void update_state_transition(double Dt);
+      void update_state_transition(double Dt);  //! lowercase d
       // f11 : update state transition;
       void update_sensor_noise(MatrixXf R); // Find out - how to update R?
       // f12 : get data from sensors (may have parameters according to sensors spec)
