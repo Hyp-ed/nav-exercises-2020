@@ -17,9 +17,10 @@ class KalmanFilter {
     KalmanFilter(uint8_t n, uint8_t m, uint8_t k = 0);
 	
     // f6 : set_initial
-	VectorXf set_initial(float pos, float velocity, float acc);
+	VectorXf set_initial(VectorXf measurement);
+	MatrixXf set_initial_covariance(double covariance);
     // f7 : filter : Calls five main kalman filtering equations / functions
-	void call_equations();
+	void call_equations(double dt, VectorXf measurement);
     // f8 : get_state
 	VectorXf get_state();
     // f9 : get_covariance
@@ -32,7 +33,7 @@ class KalmanFilter {
 	  MatrixXf predict_state_covariance();
 
 	// f3 : kalman gain
-	  VectorXf kalman_gain();
+	  MatrixXf kalman_gain();
 
     // f2 : estimate state (update based on measurement)
 	  VectorXf estimate_state();
@@ -40,10 +41,10 @@ class KalmanFilter {
 	  MatrixXf estimate_state_covariance();
 
     // f10 : update state transition
-	  MatrixXf update_state_transition();
+	  MatrixXf update_state_transition(double dt);
 
-    static constexpr float kStateCovarianceNoise = 0.01;
-    static constexpr float kMeasurementNoise = 0.01;
+    static constexpr float kStateCovarianceNoise = 0.01; /// used for P
+    static constexpr float kMeasurementNoise = 0.01; /// used for R
 
     uint8_t n_;
     uint8_t m_;
