@@ -67,9 +67,13 @@ MatrixXf KalmanFilter::createStateCovarianceNoiseMatrix(float val) {
 }
 
 MatrixXf KalmanFilter::createDimensionChangeMatrix() {
-  MatrixXf H(m_, n_);
+  MatrixXf H = MatrixXf::Constant(m_, n_, 0);
+  for(int i = 0; i < m_; i++) {
+    if(i < n_) {
+      H(i, i) = 1;
+    }
+  }
   return H;
-  // TODO - finish code for createDimensionChangeMatrix
 }
 
 MatrixXf KalmanFilter::createMeasurementNoiseMatrix(float val) {
