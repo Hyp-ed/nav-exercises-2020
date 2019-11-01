@@ -3,8 +3,12 @@
 #include <iostream>
 #include <Eigen/Dense>
 
+namespace hyped {
+
 using Eigen::VectorXf;
 using Eigen::MatrixXf;
+
+namespace navigation {
 
 class KalmanFilter {
   public:
@@ -14,7 +18,7 @@ class KalmanFilter {
      * m : dimension of the measurement
      * k : dimension of control   NOTE: will not be used in this implementation
      */
-    KalmanFilter(uint8_t n, uint8_t m, uint8_t k = 0);
+    KalmanFilter(uint8_t = 3, uint8_t m = 1, uint8_t k = 0);
 
     // f6 : set_initial
     // f7 : filter : Calls five main kalman filtering equations / functions
@@ -45,4 +49,5 @@ class KalmanFilter {
     MatrixXf I_;  // identity matrix (n x n)
 
 };
+}}
 #endif  // KALMAN_FILTER_HPP

@@ -2,5 +2,21 @@
 # Makefile include defining variable SRCS containing list of all source files
 
 SRCS := \
+  data/data.cpp \
   navigation/kalman_filter.cpp \
+  navigation/navigation.cpp \
   navigation/main.cpp \
+  sensors/imu.cpp \
+  sensors/imu_manager.cpp \
+  utils/concurrent/barrier.cpp \
+  utils/concurrent/condition_variable.cpp \
+  utils/concurrent/lock.cpp \
+  utils/concurrent/thread.cpp \
+  utils/io/can.cpp \
+  utils/io/gpio.cpp \
+  utils/io/spi.cpp \
+  utils/io/adc.cpp \
+  utils/config.cpp \
+  utils/logger.cpp \
+  utils/system.cpp \
+  utils/timer.cpp \
