@@ -41,9 +41,9 @@ ImuManager::ImuManager(uint8_t id, Logger& log)
   old_timestamp_ = utils::Timer::getTimeMicros();
 
   utils::io::SPI::getInstance().setClock(utils::io::SPI::Clock::k1MHz);
-  
+  std::array<uint32_t, data::Sensors::kNumImus> imu_chipselects = {47, 22, 27, 86};
   for (int i = 0; i < data::Sensors::kNumImus; i++) {   // creates new real IMU objects
-    imu_[i] = new Imu(log, sys_.config->sensors.chip_select[i], 0x08);
+    imu_[i] = new Imu(log, /*sys_.config->sensors.chip_select[i]*/ imu_chipselects[i], 0x08);
   }
 
   utils::io::SPI::getInstance().setClock(utils::io::SPI::Clock::k20MHz);
