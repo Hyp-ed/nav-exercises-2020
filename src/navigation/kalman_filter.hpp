@@ -14,7 +14,7 @@ class KalmanFilter {
      * m : dimension of the measurement
      * k : dimension of control   NOTE: will not be used in this implementation
      */
-    KalmanFilter(uint8_t n, uint8_t m, uint8_t k);
+    KalmanFilter(uint8_t n = 3, uint8_t m = 1, uint8_t k = 0);
     // f6 : set_initial
     void set_initial(float dt);
     // f7 : filter : Calls five main kalman filtering equations / functions
