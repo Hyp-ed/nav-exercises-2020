@@ -63,4 +63,98 @@ void Navigation::navigate()
   queryImus();
   updateData();
 }
+
+void Navigation::m_zscore(NavigationArray& data_array)
+{
+
+  NavigationArray data_array_copy;
+  const int length = data_array_copy.size();
+
+  for(int i = 0 ; i < length ; i++) {
+    data_array_copy[i] = data_array[i];
+  } 
+
+  int mid = (length / 2) - 1;
+  float median = 0;
+  float mean = 0;
+  float medAD = 0;
+  float meanAD = 0;
+  NavigationArray medADarray;
+  NavigationArray meanADarray;
+  NavigationArray modZscore;
+
+std::sort(std::begin(data_array_copy), std::end(data_array_copy));
+
+  if (length % 2 == 0)
+  {
+    median = (data_array_copy[mid] + data_array_copy[mid + 1]) / 2;
+  }
+  else
+  {
+    median = data_array_copy[mid];
+  }
+
+  for (int i = 0; i < length; i++)
+  {
+    mean += data_array_copy[i];
+  }
+  mean = mean / length;
+
+  for (int i = 0; i < length; i++)
+  {
+    medADarray[i] = fabs(data_array[i] - median); 
+    
+  }
+
+  std::sort(std::begin(medADarray), std::end(medADarray));
+  
+  if (length % 2 == 0)
+  {
+    medAD = (medADarray[mid] + medADarray[mid + 1]) / 2;
+    
+  }
+  else
+  {
+    medAD = medADarray[mid];
+  }
+  
+  for (int i = 0; i < length; i++)
+  {
+    meanADarray[i] = fabs(data_array[i] - mean); 
+    
+  }
+  
+  std::sort(std::begin(meanADarray), std::end(meanADarray));
+
+  if (length % 2 == 0)
+  {
+    meanAD = (meanADarray[mid] + meanADarray[mid + 1]) / 2;
+  }
+  else
+  {
+    meanAD = meanADarray[mid];
+  }
+  
+  for (int i = 0; i < length; i++)
+  {
+    if (medAD != 0)
+    {
+      modZscore[i] = (data_array[i] - median) / (1.486 * medAD);
+    }
+    else
+    {
+      modZscore[i] = (data_array[i] - median) / (1.253314 * meanAD); 
+    }
+  }
+
+  for (int i = 0; i < length ; i++) {
+    if(fabs(modZscore[i] > 3.5)) {
+      data_array[i] = median;
+    }
+  }
+
+  
+{  
+
+}
 }}  // namespace hyped::navigation
