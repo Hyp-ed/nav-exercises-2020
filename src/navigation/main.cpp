@@ -1,12 +1,33 @@
 #include <iostream>
+#include <vector>
+#include <fstream>
 #include "kalman_filter.cpp"
 
 int main() {
-  MatrixXf A(3, 3);
-  A << 5, 2, 3, 4, 5, 6, 7, 8, 9;
-  KalmanFilter aa(3, 3, 0);
-  aa.set_initial(0.5);
-  std::cout << aa.get_state() << std::endl;
-  std::cout << A << std::endl;
+  KalmanFilter kf(3, 1, 0);
+  kf.set_initial(0.05);
+  std::vector<float>measurements;
+  std::ifstream fin("data.txt");
+  int n;
+  fin >> n;
+  for(int i = 0; i < n; i++)
+  {
+    float ac;
+    fin >> ac >> ac;
+    measurements.push_back(ac);
+  }
+  fin.close();
+
+  std::ofstream fout("predictions.txt");
+  for(int i = 0; i < n; i++)
+  {
+    float measurement = measurements[i];
+    VectorXf z = VectorXf::Constant(1, 0.0);
+    z(0, 0) = measurement;
+    kf.filter(z);
+    // fout << kf.get_state() << "\n" << "\n";
+    fout << kf.get_state()(0, 0) << " " << kf.get_state()(1, 0) << " " << kf.get_state()(2, 0) << "\n";
+  }
+  fout.close();
   return 0;
 }

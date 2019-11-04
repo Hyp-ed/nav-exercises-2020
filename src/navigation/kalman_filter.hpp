@@ -14,7 +14,7 @@ class KalmanFilter {
      * m : dimension of the measurement
      * k : dimension of control   NOTE: will not be used in this implementation
      */
-    KalmanFilter(uint8_t n, uint8_t m, uint8_t k = 0);
+    KalmanFilter(uint8_t n, uint8_t m, uint8_t k);
     // f6 : set_initial
     void set_initial(float dt);
     // f7 : filter : Calls five main kalman filtering equations / functions
@@ -27,9 +27,9 @@ class KalmanFilter {
     // additional
     // f11 : create state transition matrix
     MatrixXf createStateTransitionMatrix(float dt); // A_ - done
-    MatrixXf createStateCovarianceMatrix(float val); // P_
-    MatrixXf createStateCovarianceNoiseMatrix(float val); // Q_
-    MatrixXf createDimensionChangeMatrix(); // H_
+    MatrixXf createStateCovarianceMatrix(float val); // P_ - done
+    MatrixXf createStateCovarianceNoiseMatrix(float val); // Q_ - done
+    MatrixXf createDimensionChangeMatrix(); // H_ - done
     MatrixXf createMeasurementNoiseMatrix(float val); // R_ - done
     
   private:
@@ -46,9 +46,9 @@ class KalmanFilter {
     // f10 : update state transition
     void updateStateTransition(float dt);
     
-    static constexpr float kStateCovarianceNoise = 0.01; // Q_
+    static constexpr float kStateCovarianceNoise = 0.3; // Q_
     static constexpr float kMeasurementNoise = 0.01; // R_
-    static constexpr float kError = 0.5; // New added - P_
+    static constexpr float kError = 0.1; // P_
 
     uint8_t n_;
     uint8_t m_;

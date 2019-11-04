@@ -1,12 +1,12 @@
 #include <iostream>
 #include "kalman_filter.hpp"
 
-KalmanFilter::KalmanFilter(uint8_t n, uint8_t m, uint8_t k) {
+KalmanFilter::KalmanFilter(uint8_t n = 3, uint8_t m = 1, uint8_t k = 0) {
   n_ = n, m_ = m, k_ = k;
 }
 
 void KalmanFilter::set_initial(float dt) {
-  x_ = VectorXf::Constant(n_, 0);
+  x_ = VectorXf::Constant(n_, 0.0);
   A_ = createStateTransitionMatrix(dt);
   P_ = createStateCovarianceMatrix(kError);
   Q_ = createStateCovarianceNoiseMatrix(kStateCovarianceNoise);
@@ -30,28 +30,28 @@ void KalmanFilter::filter(VectorXf z) {
   predictState();
 
   // 2.
-  estimateState();
+  predictStateCovariance();
 
   // 3.
   calculateKalmanGain();
 
   // 4.
-  predictStateCovariance();
+  estimateState();
 
   // 5.
   estimateStateCovariance();
 }
 
 MatrixXf KalmanFilter::createStateTransitionMatrix(float dt) {
-  MatrixXf A = MatrixXf::Constant(n_, n_, 0);
-  A(0, 0) = 1;
-  A(1, 1) = 1;
-  A(2, 2) = 1;
+  MatrixXf A = MatrixXf::Constant(n_, n_, 0.0);
+  A(0, 0) = 1.0;
+  A(1, 1) = 1.0;
+  A(2, 2) = 1.0;
 
   A(0, 1) = dt;
   A(1, 2) = dt;
 
-  A(0, 2) = dt * dt / 2;
+  A(0, 2) = dt * dt / 2.0;
 
   return A;
 }
@@ -67,11 +67,14 @@ MatrixXf KalmanFilter::createStateCovarianceNoiseMatrix(float val) {
 }
 
 MatrixXf KalmanFilter::createDimensionChangeMatrix() {
-  MatrixXf H = MatrixXf::Constant(m_, n_, 0);
+  MatrixXf H = MatrixXf::Constant(m_, n_, 0.0);
+  // for(int i = 0; i < m_; i++) {
+  //   if(i < n_) {
+  //     H(i, i) = 1;
+  //   }
+  // }
   for(int i = 0; i < m_; i++) {
-    if(i < n_) {
-      H(i, i) = 1;
-    }
+    H(i, n_ - 1) = 1.0;
   }
   return H;
 }
