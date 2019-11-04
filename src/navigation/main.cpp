@@ -27,6 +27,7 @@ int main() {
     kf.filter(z);
     // fout << kf.get_state() << "\n" << "\n";
     fout << kf.get_state()(0, 0) << " " << kf.get_state()(1, 0) << " " << kf.get_state()(2, 0) << "\n";
+    // fout << kf.getKalmanGain() << "\n" << "\n";
   }
   fout.close();
   return 0;

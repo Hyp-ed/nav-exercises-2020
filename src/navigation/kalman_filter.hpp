@@ -23,6 +23,8 @@ class KalmanFilter {
     VectorXf get_state();
     // f9 : get_covariance
     MatrixXf get_covariance();
+    // f10 : get Kalman Gain
+    MatrixXf getKalmanGain();
 
     // additional
     // f11 : create state transition matrix

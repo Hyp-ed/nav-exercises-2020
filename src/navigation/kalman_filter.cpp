@@ -23,6 +23,10 @@ MatrixXf KalmanFilter::get_covariance() {
   return P_;
 }
 
+MatrixXf KalmanFilter::getKalmanGain() {
+  return K_;
+}
+
 void KalmanFilter::filter(VectorXf z) {
   z_ = z; // assigning measurement
 
