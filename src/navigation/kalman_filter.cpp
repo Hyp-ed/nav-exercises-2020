@@ -53,7 +53,7 @@ void KalmanFilter::filter(VectorXf z) {
 MatrixXf KalmanFilter::createStateTransitionMatrix(float dt) {
   MatrixXf A = MatrixXf::Constant(n_, n_, 0.0);
   if(n_ == 1) {
-    A(0, 0) = dt * dt / 2.0;
+    A(0, 0) = 1;
   } else if(n_ == 3) {
     A(0, 0) = 1.0;
     A(1, 1) = 1.0;
