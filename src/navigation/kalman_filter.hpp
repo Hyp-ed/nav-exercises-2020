@@ -2,6 +2,7 @@
 #define KALMAN_FILTER_HPP
 #include <iostream>
 #include <Eigen/Dense>
+#include <vector>
 
 //!!! General comment: fewer return statements, work more with member variables
 using Eigen::VectorXf;
@@ -15,54 +16,67 @@ using Eigen::MatrixXf;
       * m : dimension of the measurement
       * k : dimension of control   NOTE: will not be used in this implementation
       */
-      KalmanFilter(uint8_t n, uint8_t m, uint8_t k = 0);
+    
+      KalmanFilter(int n, int m, int k = 0);
 
-      // f6 : set_initial
-      // f7 : filter : Calls five main kalman filtering equations / functions
-      // f8 : get_state
-      // f9 : get_covariance
+      /*
+      * Constructor call for a kalman filter
+      * x : state
+      * A : Transition Matrix
+      * P : Covariance
+      * Q : Random uncertainty covariacne
+      * H : Measurement Matrix
+      * R : Sensor Noise Covariance
+      */
+      void init(VectorXf x, MatrixXf A, MatrixXf P, MatrixXf Q, MatrixXf H, MatrixXf R);
 
+      // set initial state and covariance
       void set_initial(VectorXf init);  //! Add initial covariance matrix
 
+      // get state
       VectorXf get_state();
 
+      // get covariacne
       MatrixXf get_covariance();
 
-      void filter();  //!! Two variables missing, update this! (real life values)
+      // filter using 5 KF equations
+      /*
+      * dt : Time interval
+      * s  : state
+      * z  : sensor measurement vector
+      */
+      void filter(float dt, VectorXf s, VectorXf z);  //!! Two variables missing, update this! (real life values) - fixed
 
-    private:
+    public:
       // f1 : predict state
-
-      VectorXf predict_state();
+      void predict_state();
       // f2 : estimate state (update based on measurement)
-      VectorXf estimate_state(MatrixXf K);
+      void estimate_state(MatrixXf K, VectorXf z);
       // f3 : kalman gain
       MatrixXf kalman_gain();
       // f4 : predict state covariance
-      MatrixXf predict_covariance();
+      void predict_covariance();
       // f5 : estimate state covariance
-      MatrixXf estimate_covariance(MatrixXf K);
+      void estimate_covariance(MatrixXf K);
       // f10 : update state transition;
-      void update_state_transition(double Dt);  //! lowercase d
+      void update_state_transition(float Dt);  //! lowercase d
       // f11 : update state transition;
       void update_sensor_noise(MatrixXf R); // Find out - how to update R?
       // f12 : get data from sensors (may have parameters according to sensors spec)
       //       Will set the measurement vector
-      // VectorXf get_data();
+      // Vector get_data();
       // f13 : get measurement
       void set_measurement(VectorXf z);
       // f14 : get measurement
       VectorXf get_measurement();
-      // f15 : get time interval since last data read
-      double get_time_interval();
+      // Setting Matrix H;
+      MatrixXf set_measurement_matrix();
 
-      // these guys throw a warning. On the Hyped 2019 github code, they dont. Need to further invastigate why...
-      static const float kStateCovarianceNoise = 0.01;
-      static const float kMeasurementNoise = 0.01;
 
-      uint8_t n_;
-      uint8_t m_;
-      uint8_t k_;
+
+      int n_;
+      int m_;
+      int k_;
 
       VectorXf x_;  // current state (n x 1)
       VectorXf z_;  // measurement (m x 1)
