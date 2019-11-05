@@ -28,7 +28,7 @@ using Eigen::MatrixXf;
       * H : Measurement Matrix
       * R : Sensor Noise Covariance
       */
-      void init(VectorXf x, MatrixXf A, MatrixXf P, MatrixXf Q, MatrixXf H, MatrixXf R);
+      void init(VectorXf x, MatrixXf A, MatrixXf P, MatrixXf Q, MatrixXf R);
 
       // set initial state and covariance
       void set_initial(VectorXf init);  //! Add initial covariance matrix

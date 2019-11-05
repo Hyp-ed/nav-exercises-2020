@@ -43,7 +43,7 @@ int main(){
 
 
   KalmanFilter KF = KalmanFilter(3,1,0);
-  KF.init(s, A, P, Q, H, R);
+  KF.init(s, A, P, Q, R);
 
   KF.set_initial(s);
 
@@ -51,57 +51,43 @@ int main(){
 
   std::cout << "state: \n";
 
-    // KF.update_state_transition(0.05);
+  demo_IMU_data IMU_demo = demo_IMU_data("state_acc.txt");
+  vector< vector<float> > data = IMU_demo.get_data();
+  float dt;
 
-    // KF.predict_state();
-    // KF.predict_covariance();
+  VectorXf s_update(3);
 
-    KF.update_state_transition(0.05);
-    KF.predict_state();
-    KF.predict_covariance();
+  std::ofstream fout("text_results.txt");
 
-     std::cout << KF.get_covariance();
+  for(std::size_t i=0; i < data.size(); ++i)
+  {
+        z(0) = data[i][1];
 
-    // MatrixXf K(n_, n_);
-    // K = KF.kalman_gain();
+        if (i == 0){
+              KF.filter(0.05,s,z);
+        }
+        else{
+              dt = (float)0.001*(data[i][0] - data[i-1][0]);
 
-    // // KF.get_data(); // manipulate sensor data and set measurement VectorXf
+              KF.filter(dt,s,z);
+        }
 
-    // KF.estimate_state(K,z);
+        // state update (Need to find out whether the state from the KF can update the speed and velocity)
+        // I think that would work if the accceleration would be at the last entry of the vector which
+        // cannot be done since from the current state formula x = x + K * (z - H * x) the result of K * (z - H * x)
+        // would be (a,v,s) amd not (s,v,a). Some extreme testing has to be taken in order to either resolve,
+        // this possible issue (it may cause less accuracy in printing the state by the vector below), but,
+        // untill then, this solution can be considered.
 
-    // KF.estimate_covariance(K);
+        s_update << KF.get_state()(2) * dt * dt/2 + s_update(1) * dt + s_update(2), KF.get_state()(1) * dt + s_update(1), KF.get_state()(2);
 
-//   demo_IMU_data IMU_demo = demo_IMU_data("state_acc.txt");
-//   vector< vector<float> > data = IMU_demo.get_data();
-//   float dt;
-
-//   VectorXf s_update(3);
-
-//   std::ofstream fout("text_results.txt");
-//   for(std::size_t i=0; i < data.size(); ++i)
-//   {
-//         z(1) = data[i][1];
-
-//         if (i == 0){
-//               KF.filter(0.05,s,z);
-//         }
-//         else{
-//               dt = (float)0.001*(data[i][0] - data[i-1][0]);
-
-//               KF.filter(dt,s,z);
-//         }
-
-//         // state update (Need to find out whether the state from the KF can update the speed and velocity)
-//         // I think that would work if the accceleration would be at the last entry of the vector which
-//         // cannot be done since from the current state formula x = x + K * (z - H * x) the result of K * (z - H * x)
-//         // would be (a,v,s) amd not (s,v,a). Some extreme testing has to be taken in order to either resolve,
-//         // this possible issue (it may cause less accuracy in printing the state by the vector below), but,
-//         // untill then, this solution can be considered.
-//         VectorXf s_update(3);
-//         s_update << KF.get_state()(0), KF.get_state()(0) * dt + s_update(1), KF.get_state()(0) * dt * dt/2 + s_update(1) * dt + s_update(2);
-
-//         fout << s_update;
-//   }
+        fout << KF.get_state()(0);
+        fout << '\t';
+        fout << KF.get_state()(1);
+        fout << '\t';
+        fout << KF.get_state()(2);
+        fout << '\n';
+  }
   
   return 0;
 

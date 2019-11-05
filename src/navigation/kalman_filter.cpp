@@ -7,7 +7,7 @@ using namespace std;
 using Eigen::VectorXf;
 using Eigen::MatrixXf;
 
-void KalmanFilter::init(VectorXf x, MatrixXf A, MatrixXf P, MatrixXf Q, MatrixXf H, MatrixXf R){
+void KalmanFilter::init(VectorXf x, MatrixXf A, MatrixXf P, MatrixXf Q, MatrixXf R){
     x_ = x;
     A_ = A;
     P_ = P;
@@ -15,7 +15,7 @@ void KalmanFilter::init(VectorXf x, MatrixXf A, MatrixXf P, MatrixXf Q, MatrixXf
     H_ = set_measurement_matrix();
     R_ = R;
     I_ = MatrixXf::Identity(n_, n_);
-    
+
     //creating the init MatrixXf. Find a way to add this to the MatrixXf_lib as a method and not allow the user to assign a new value to it.
 
     //creating the init MatrixXf. Find a way to add this to the MatrixXf_lib as a method and not allow the user to assign a new value to it.
@@ -44,9 +44,10 @@ MatrixXf KalmanFilter::set_measurement_matrix()
 {
     MatrixXf H(m_, n_);
     H = MatrixXf::Zero(m_,n_);
+
     for(int i = 0; i < m_; i++)
     {
-        H(i, i) = 1;
+        H(i, n_ - m_ + i) = 1;
     }
 
     return H;
@@ -97,7 +98,7 @@ void KalmanFilter::predict_covariance(){
 }
 
 MatrixXf KalmanFilter::kalman_gain(){
-    MatrixXf K(n_, n_);
+    MatrixXf K(n_, m_);
     K = (P_ * H_.transpose()) * (H_ * P_ * H_.transpose() + R_).inverse();
     return K;
 }
@@ -111,6 +112,7 @@ void KalmanFilter::estimate_covariance(MatrixXf K){
 }
 
 void KalmanFilter::update_state_transition(float dt){
+
     MatrixXf A(n_, n_);
     A = MatrixXf::Zero(n_,n_);
 
