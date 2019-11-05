@@ -78,10 +78,20 @@ namespace navigation {
       ImuDataPointArray sensor_readings_;
       DataPoint<NavigationType> acceleration_;
 
+      // To calculate estimates
+      // previous timestamp
+      uint32_t prev_timestamp_;
+      // initial timestamp set
+      bool is_init_;
+
       /**
        * @brief Query sensors to determine acceleration, velocity and distance
        */
       void queryImus();
+      /**
+       * @brief Set initial timestamps
+       */
+      void set_init();
   };
 
 
