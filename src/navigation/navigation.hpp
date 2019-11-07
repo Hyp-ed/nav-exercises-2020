@@ -36,7 +36,7 @@ namespace navigation {
       typedef std::array<NavigationType, data::Sensors::kNumImus>     NavigationArray;
       typedef std::array<KalmanFilter, 3 * data::Sensors::kNumImus>       FilterArray;
       typedef std::array<data::StripeCounter, data::Sensors::kNumKeyence>  KeyenceDataArray;
-      typedef std::array<std::array<NavigationType, 3>, data::Sensors::kNumImus>  EstimateArray;
+      typedef std::array<NavigationArray, 3>  EstimateArray;
 
       /**
        * @brief Construct a new Navigation object
@@ -61,12 +61,7 @@ namespace navigation {
        */
       void navigate();
 
-      void m_zscore(NavigationArray data_array);
-      /**
-       * 
-       * 
-      */
-     
+ 
     private:
       static constexpr int kPrintFreq = 1;
 
@@ -100,6 +95,10 @@ namespace navigation {
        * @brief Set initial timestamps
        */
       void set_init();
+      /**
+       * @brief Detects outliers in data array based on modified z-score
+       */ 
+      void m_zscore(NavigationArray& data_array);
   };
 
 

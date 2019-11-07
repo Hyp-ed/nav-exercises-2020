@@ -40,7 +40,6 @@ NavigationVector Navigation::getAcceleration() const
 void Navigation::queryImus()
 {
   NavigationVectorArray acc_raw;
-  OnlineStatistics<NavigationType> acc_avg_filter;
   sensor_readings_ = data_.getSensorsImuData();
 
   for(int i = 0; i < data::Sensors::kNumImus; i++) {
@@ -50,26 +49,28 @@ void Navigation::queryImus()
   }
 
   uint32_t t = sensor_readings_.timestamp;
-  // process raw values
 
-
+  // Filtering
   float new_dt = float(t - acceleration_.timestamp) / 1e6;
   for(int i = 0; data::Sensors::kNumImus; i++) {
     for(int j = 0; j < 3; j++) {
       filters_[i * 3 + j].updateStateTransition(new_dt);
       VectorXf z = VectorXf::Constant(1, acc_raw[i][j]); // measurement vector
       filters_[i * 3 + j].filter(z);
-      estimate_[i][j] = filters_[i * 3 + j].get_state()(0);
+      estimate_[j][i] = filters_[i * 3 + j].get_state()(0);
     }
   }
 
-  // outlier detection missing!
-  // outlier_detec(estimate_);
-  
+  // outlier detection
+  for(int j = 0; j < 3; j++) {
+    m_zscore(estimate_[j]);
+  }
+
+  // Arithmetic average of acceleration values
   for(int j = 0; j < 3; j++) {
     acceleration_.value[j] = 0;
     for(int i = 0; i < data::Sensors::kNumImus; i++) {
-      acceleration_.value[j] += estimate_[i][j];
+      acceleration_.value[j] += estimate_[j][i];
     }
     acceleration_.value[j] /= (float) data::Sensors::kNumImus; 
   }
@@ -83,9 +84,9 @@ void Navigation::updateData()
 
   data_.setNavigationData(nav_data);
 
-  if (counter_ % 100 == 0) {  // kPrintFreq
-    log_.DBG("NAV", "%d: Data Update: a_x=%.3f", // TODO(anyone) here data will be printed!
-               counter_, nav_data.acceleration);
+  if (counter_ % 1000 == 0) {  // kPrintFreq
+    log_.DBG("NAV", "%d: Data Update: a_x=%.3f, a_y=%.3f, a_z=%.3f",
+               counter_, acceleration_.value[0], acceleration_.value[1], acceleration_.value[2]);
   }
   counter_++;
 }
@@ -97,7 +98,7 @@ void Navigation::navigate()
   updateData();
 }
 
-void Navigation::m_zscore(NavigationArray data_array)
+void Navigation::m_zscore(NavigationArray& data_array)
 {
 
   NavigationArray data_array_copy;
@@ -116,7 +117,7 @@ void Navigation::m_zscore(NavigationArray data_array)
   NavigationArray meanADarray;
   NavigationArray modZscore;
 
-std::sort(std::begin(data_array_copy), std::end(data_array_copy));
+  std::sort(std::begin(data_array_copy), std::end(data_array_copy));
 
   if (length % 2 == 0)
   {
@@ -185,11 +186,13 @@ std::sort(std::begin(data_array_copy), std::end(data_array_copy));
       data_array[i] = median;
     }
   }
-  
-  void Navigation::set_init()
+}
+
+void Navigation::set_init()
 {
   prev_timestamp_ = utils::Timer::getTimeMicros();
+  acceleration_.timestamp = prev_timestamp_;
   is_init_ = true;
 }
 
-}}} // namespace hyped::navigation
+}} // namespace hyped::navigation
