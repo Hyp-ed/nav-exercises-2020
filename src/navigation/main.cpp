@@ -116,12 +116,12 @@ int main(){
     else{
       dt = (float)0.001*(data[i][0] - data[i-1][0]);
 
-      std::cout << i;
-      std::cout << " - data";
-      std::cout << '\n';
-      std::cout << '\n';
-      std::cout << '\n';
-      std::cout << '\n';
+      // std::cout << i;
+      // std::cout << " - data";
+      // std::cout << '\n';
+      // std::cout << '\n';
+      // std::cout << '\n';
+      // std::cout << '\n';
 
       KF.filter(dt,s,z);
 

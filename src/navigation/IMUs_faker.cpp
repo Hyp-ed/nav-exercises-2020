@@ -41,7 +41,7 @@ vector< vector<float> > demo_IMU_data::get_data()
                 }
                 else{
                     getline (myfile,line, '\t');
-                    std::cout << line;
+                    // std::cout << line;
                 }
                 dt_acc.at(j+1) = strtof((line).c_str(),0); //string to flaot
             }

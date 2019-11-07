@@ -85,9 +85,9 @@ void KalmanFilter::filter(float dt, VectorXf s, VectorXf z){
 
     // KalmanFilter::get_data(); // manipulate sensor data and set measurement VectorXf
 
-    std::cout << x_;
-    std::cout << '\n';
-    std::cout << '\n';
+    // std::cout << x_;
+    // std::cout << '\n';
+    // std::cout << '\n';
     // std::cout << (z - H_ * x_);
     // std::cout << '\n';
     // std::cout << '\n';
