@@ -60,6 +60,12 @@ namespace navigation {
        */
       void navigate();
 
+      void m_zscore(NavigationArray data_array);
+      /**
+       * 
+       * 
+      */
+     
     private:
       static constexpr int kPrintFreq = 1;
 
