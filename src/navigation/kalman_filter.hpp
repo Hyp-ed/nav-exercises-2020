@@ -31,6 +31,9 @@ class KalmanFilter {
     // f10 : get Kalman Gain
     MatrixXf getKalmanGain();
 
+    // f12 : update state transition
+    void updateStateTransition(float dt);
+    
     // additional
     // f11 : create state transition matrix
     MatrixXf createStateTransitionMatrix(float dt); // A_ - done
@@ -50,8 +53,6 @@ class KalmanFilter {
     void predictStateCovariance();
     // f5 : estimate state covariance
     void estimateStateCovariance();
-    // f10 : update state transition
-    void updateStateTransition(float dt);
 
     static constexpr float kStateCovarianceNoise = 0.3; // Q_
     static constexpr float kMeasurementNoise = 0.01; // R_
