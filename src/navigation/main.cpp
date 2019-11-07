@@ -4,7 +4,7 @@
 #include "kalman_filter.cpp"
 
 int main() {
-  KalmanFilter kf(3, 1, 0);
+  KalmanFilter kf(1, 1, 0);
   kf.set_initial(0.05);
   std::vector<float>measurements;
   std::ifstream fin("data.txt");
@@ -26,7 +26,7 @@ int main() {
     z(0, 0) = measurement;
     kf.filter(z);
     // fout << kf.get_state() << "\n" << "\n";
-    fout << kf.get_state()(0, 0) << " " << kf.get_state()(1, 0) << " " << kf.get_state()(2, 0) << "\n";
+    fout << kf.get_state()(0, 0) << "\n";
     // fout << kf.getKalmanGain() << "\n" << "\n";
   }
   fout.close();
