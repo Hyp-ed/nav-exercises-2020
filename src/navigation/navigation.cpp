@@ -60,6 +60,7 @@ void Navigation::updateData()
 
 void Navigation::navigate()
 {
+  if (!is_init_) set_init();
   queryImus();
   updateData();
 }
@@ -152,9 +153,11 @@ std::sort(std::begin(data_array_copy), std::end(data_array_copy));
       data_array[i] = median;
     }
   }
-
   
-{  
-
+  void Navigation::set_init()
+{
+  prev_timestamp_ = utils::Timer::getTimeMicros();
+  is_init_ = true;
 }
+
 }}} // namespace hyped::navigation
