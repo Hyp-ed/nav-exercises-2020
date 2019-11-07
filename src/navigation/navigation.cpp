@@ -64,13 +64,13 @@ void Navigation::navigate()
   updateData();
 }
 
-void Navigation::m_zscore(NavigationArray& data_array)
+void Navigation::m_zscore(NavigationArray data_array)
 {
 
   NavigationArray data_array_copy;
-  const int length = data_array_copy.size();
+  const int length = data_array.size(); // CHECK DATA_ARRAY_COPY ---- lENGTH = 0??
 
-  for(int i = 0 ; i < length ; i++) {
+  for(int i = 0 ; i < length ; i++) {      
     data_array_copy[i] = data_array[i];
   } 
 
@@ -148,7 +148,7 @@ std::sort(std::begin(data_array_copy), std::end(data_array_copy));
   }
 
   for (int i = 0; i < length ; i++) {
-    if(fabs(modZscore[i] > 3.5)) {
+    if(fabs(modZscore[i]) > 3.5) {
       data_array[i] = median;
     }
   }
@@ -157,4 +157,4 @@ std::sort(std::begin(data_array_copy), std::end(data_array_copy));
 {  
 
 }
-}}  // namespace hyped::navigation
+}}} // namespace hyped::navigation

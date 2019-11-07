@@ -60,7 +60,7 @@ namespace navigation {
        */
       void navigate();
 
-      void m_zscore(NavigationArray& data_array);
+      void m_zscore(NavigationArray data_array);
       /**
        * 
        * 
