@@ -77,12 +77,32 @@ void KalmanFilter::filter(float dt, VectorXf s, VectorXf z){
     KalmanFilter::update_state_transition(dt);
 
     KalmanFilter::predict_state();
+
     KalmanFilter::predict_covariance();
 
     MatrixXf K(n_, n_);
     K = KalmanFilter::kalman_gain();
 
     // KalmanFilter::get_data(); // manipulate sensor data and set measurement VectorXf
+
+    std::cout << x_;
+    std::cout << '\n';
+    std::cout << '\n';
+    // std::cout << (z - H_ * x_);
+    // std::cout << '\n';
+    // std::cout << '\n';
+    // std::cout << H_ * x_;
+    // std::cout << '\n';
+    // std::cout << '\n';
+    // std::cout << z;
+    // std::cout << '\n';
+    // std::cout << '\n';
+    // std::cout << K;
+    // std::cout << '\n';
+    // std::cout << '\n';
+    // std::cout << P_;
+    // std::cout << '\n';
+    // std::cout << '\n';
 
     KalmanFilter::estimate_state(K,z);
     KalmanFilter::estimate_covariance(K);
@@ -116,7 +136,7 @@ void KalmanFilter::update_state_transition(float dt){
     MatrixXf A(n_, n_);
     A = MatrixXf::Zero(n_,n_);
 
-    VectorXf s (n_);
+    VectorXf s (3);
     s << 1.0, dt, dt*dt/2; // {displacement, velocity, acceleration placeholders}
 
     for(int i = 0; i < n_; i++)
