@@ -34,8 +34,9 @@ namespace navigation {
       typedef DataPoint<ImuDataArray>                                 ImuDataPointArray;
       typedef std::array<NavigationVector, data::Sensors::kNumImus>   NavigationVectorArray;
       typedef std::array<NavigationType, data::Sensors::kNumImus>     NavigationArray;
-      typedef std::array<KalmanFilter, data::Sensors::kNumImus>       FilterArray;
-      typedef array<data::StripeCounter, data::Sensors::kNumKeyence>  KeyenceDataArray;
+      typedef std::array<KalmanFilter, 3 * data::Sensors::kNumImus>       FilterArray;
+      typedef std::array<data::StripeCounter, data::Sensors::kNumKeyence>  KeyenceDataArray;
+      typedef std::array<NavigationArray, 3>  EstimateArray;
 
       /**
        * @brief Construct a new Navigation object
@@ -49,7 +50,7 @@ namespace navigation {
        * @return NavigationType Returns the forward component of acceleration vector (negative when
        *                        decelerating) [m/s^2]
        */
-      NavigationType getAcceleration() const;
+      NavigationVector getAcceleration() const;
       /**
        * @brief Update central data structure
        */
@@ -60,12 +61,7 @@ namespace navigation {
        */
       void navigate();
 
-      void m_zscore(NavigationArray data_array);
-      /**
-       * 
-       * 
-      */
-     
+ 
     private:
       static constexpr int kPrintFreq = 1;
 
@@ -82,7 +78,8 @@ namespace navigation {
 
       // To store estimated values
       ImuDataPointArray sensor_readings_;
-      DataPoint<NavigationType> acceleration_;
+      DataPoint<NavigationVector> acceleration_;
+      EstimateArray estimate_;
 
       // To calculate estimates
       // previous timestamp
@@ -98,6 +95,10 @@ namespace navigation {
        * @brief Set initial timestamps
        */
       void set_init();
+      /**
+       * @brief Detects outliers in data array based on modified z-score
+       */ 
+      void m_zscore(NavigationArray& data_array);
   };
 
 

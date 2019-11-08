@@ -15,18 +15,23 @@ Navigation::Navigation(Logger& log)
            data_(Data::getInstance()),
            status_(ModuleStatus::kStart),
            counter_(0),
-           acceleration_(0, 0.)  // TODO(anyone): Make this so we have 3d acceleration!
+           acceleration_(0, NavigationVector())  // TODO(anyone): Make this so we have 3d acceleration!
 {
   log_.INFO("NAV", "Navigation module started");
   for (unsigned int i = 0; i < data::Sensors::kNumImus; i++) {
-    // filters_[i] = KalmanFilter(1, 1);
-    // TODO(KF team) fix kalman filter setup
-    // filters_[i].setup();
+    for(int j = 0; j < 3; j++) {
+      filters_[i * 3 + j] = KalmanFilter(1, 1);
+      // TODO(KF team) fix kalman filter setup
+      filters_[i * 3 + j].set_initial(0); // initalising with dummy time interval(0), but can be changed later
+    }
+  }
+  for(int i = 0; i < 3; i++) {
+    acceleration_.value[i] = 0;
   }
   log_.INFO("NAV", "Navigation module initialised");
 }
 
-NavigationType Navigation::getAcceleration() const
+NavigationVector Navigation::getAcceleration() const
 {
   return acceleration_.value;
 }
@@ -35,25 +40,53 @@ NavigationType Navigation::getAcceleration() const
 void Navigation::queryImus()
 {
   NavigationVectorArray acc_raw;
-  OnlineStatistics<NavigationType> acc_avg_filter;
   sensor_readings_ = data_.getSensorsImuData();
-  uint32_t t = sensor_readings_.timestamp;
-  // process raw values
 
-  acceleration_.value = acc_avg_filter.getMean();
+  for(int i = 0; i < data::Sensors::kNumImus; i++) {
+    for(int j = 0; j < 3; j++) {
+      acc_raw[i][j] = sensor_readings_.value[i].acc[j];
+    }
+  }
+
+  uint32_t t = sensor_readings_.timestamp;
+
+  // Filtering
+  float new_dt = float(t - acceleration_.timestamp) / 1e6;
+  for(int i = 0; data::Sensors::kNumImus; i++) {
+    for(int j = 0; j < 3; j++) {
+      filters_[i * 3 + j].updateStateTransition(new_dt);
+      VectorXf z = VectorXf::Constant(1, acc_raw[i][j]); // measurement vector
+      filters_[i * 3 + j].filter(z);
+      estimate_[j][i] = filters_[i * 3 + j].get_state()(0);
+    }
+  }
+
+  // outlier detection
+  for(int j = 0; j < 3; j++) {
+    m_zscore(estimate_[j]);
+  }
+
+  // Arithmetic average of acceleration values
+  for(int j = 0; j < 3; j++) {
+    acceleration_.value[j] = 0;
+    for(int i = 0; i < data::Sensors::kNumImus; i++) {
+      acceleration_.value[j] += estimate_[j][i];
+    }
+    acceleration_.value[j] /= (float) data::Sensors::kNumImus; 
+  }
   acceleration_.timestamp = t;
 }
 
 void Navigation::updateData()
 {
   data::Navigation nav_data;
-  nav_data.acceleration               = getAcceleration();
+  nav_data.acceleration               = getAcceleration()[0];
 
   data_.setNavigationData(nav_data);
 
-  if (counter_ % 100 == 0) {  // kPrintFreq
-    log_.DBG("NAV", "%d: Data Update: a_x=%.3f", // TODO(anyone) here data will be printed!
-               counter_, nav_data.acceleration);
+  if (counter_ % 1000 == 0) {  // kPrintFreq
+    log_.DBG("NAV", "%d: Data Update: a_x=%.3f, a_y=%.3f, a_z=%.3f",
+               counter_, acceleration_.value[0], acceleration_.value[1], acceleration_.value[2]);
   }
   counter_++;
 }
@@ -65,7 +98,6 @@ void Navigation::navigate() {
 }
 
 void Navigation::m_zscore(NavigationArray& data_array) {
-
   NavigationArray data_array_copy;
   const int length = data_array.size(); 
 
@@ -129,11 +161,13 @@ void Navigation::m_zscore(NavigationArray& data_array) {
       data_array[i] = median;
     }
   }
-  
-  void Navigation::set_init()
+}
+
+void Navigation::set_init()
 {
   prev_timestamp_ = utils::Timer::getTimeMicros();
+  acceleration_.timestamp = prev_timestamp_;
   is_init_ = true;
 }
 
-}}} // namespace hyped::navigation
+}} // namespace hyped::navigation
