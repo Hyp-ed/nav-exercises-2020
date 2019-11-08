@@ -91,18 +91,15 @@ void Navigation::updateData()
   counter_++;
 }
 
-void Navigation::navigate()
-{
+void Navigation::navigate() {
   if (!is_init_) set_init();
   queryImus();
   updateData();
 }
 
-void Navigation::m_zscore(NavigationArray& data_array)
-{
-
+void Navigation::m_zscore(NavigationArray& data_array) {
   NavigationArray data_array_copy;
-  const int length = data_array.size(); // CHECK DATA_ARRAY_COPY ---- lENGTH = 0??
+  const int length = data_array.size(); 
 
   for(int i = 0 ; i < length ; i++) {      
     data_array_copy[i] = data_array[i];
@@ -110,8 +107,8 @@ void Navigation::m_zscore(NavigationArray& data_array)
 
   int mid = (length / 2) - 1;
   float median = 0;
-  float mean = 0;
-  float medAD = 0;
+  float mean   = 0;
+  float medAD  = 0;
   float meanAD = 0;
   NavigationArray medADarray;
   NavigationArray meanADarray;
@@ -119,64 +116,42 @@ void Navigation::m_zscore(NavigationArray& data_array)
 
   std::sort(std::begin(data_array_copy), std::end(data_array_copy));
 
-  if (length % 2 == 0)
-  {
+  if (length % 2 == 0) {
     median = (data_array_copy[mid] + data_array_copy[mid + 1]) / 2;
-  }
-  else
-  {
-    median = data_array_copy[mid];
+  } else {
+    median = data_array_copy[mid + 1];
   }
 
-  for (int i = 0; i < length; i++)
-  {
+  for (int i = 0; i < length; i++) {
     mean += data_array_copy[i];
   }
   mean = mean / length;
 
-  for (int i = 0; i < length; i++)
-  {
-    medADarray[i] = fabs(data_array[i] - median); 
-    
+  for (int i = 0; i < length; i++) {
+    medADarray[i] = fabs(data_array[i] - median);  
   }
 
   std::sort(std::begin(medADarray), std::end(medADarray));
   
-  if (length % 2 == 0)
-  {
-    medAD = (medADarray[mid] + medADarray[mid + 1]) / 2;
-    
-  }
-  else
-  {
-    medAD = medADarray[mid];
+  if (length % 2 == 0) {
+    medAD = (medADarray[mid] + medADarray[mid + 1]) / 2; 
+  } else {
+    medAD = medADarray[mid + 1];
   }
   
-  for (int i = 0; i < length; i++)
-  {
+  for (int i = 0; i < length; i++) {
     meanADarray[i] = fabs(data_array[i] - mean); 
-    
   }
-  
-  std::sort(std::begin(meanADarray), std::end(meanADarray));
 
-  if (length % 2 == 0)
-  {
-    meanAD = (meanADarray[mid] + meanADarray[mid + 1]) / 2;
+  for (int i = 0; i < length; i++) {
+    meanAD += meanADarray[i];
   }
-  else
-  {
-    meanAD = meanADarray[mid];
-  }
+  meanAD = meanAD / length;
   
-  for (int i = 0; i < length; i++)
-  {
-    if (medAD != 0)
-    {
+  for (int i = 0; i < length; i++) {
+    if (medAD != 0) {
       modZscore[i] = (data_array[i] - median) / (1.486 * medAD);
-    }
-    else
-    {
+    } else {
       modZscore[i] = (data_array[i] - median) / (1.253314 * meanAD); 
     }
   }
