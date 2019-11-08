@@ -25,6 +25,7 @@ Navigation::Navigation(Logger& log)
       filters_[i * 3 + j].set_initial(0); // initalising with dummy time interval(0), but can be changed later
     }
   }
+
   for(int i = 0; i < 3; i++) {
     acceleration_.value[i] = 0;
   }
@@ -52,7 +53,7 @@ void Navigation::queryImus()
 
   // Filtering
   float new_dt = float(t - acceleration_.timestamp) / 1e6;
-  for(int i = 0; data::Sensors::kNumImus; i++) {
+  for(int i = 0; i < data::Sensors::kNumImus; i++) {
     for(int j = 0; j < 3; j++) {
       filters_[i * 3 + j].updateStateTransition(new_dt);
       VectorXf z = VectorXf::Constant(1, acc_raw[i][j]); // measurement vector
