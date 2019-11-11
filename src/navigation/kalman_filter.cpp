@@ -42,8 +42,9 @@ void KalmanFilter::set_initial(VectorXf init){
 
 MatrixXf KalmanFilter::set_measurement_matrix()
 {
+        // std::cout << m_*knumimus_;
     MatrixXf H(m_*knumimus_, n_);
-    H = MatrixXf::Zero(m_,n_);
+    H = MatrixXf::Zero(m_*knumimus_,n_);
 
     for(int i = 0; i < m_; i++)
     {

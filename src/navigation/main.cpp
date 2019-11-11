@@ -82,11 +82,11 @@ int main(){
 
   // VectorXf z(m);
 
-  KalmanFilter KF = KalmanFilter(n,m*knumimus, knumimus, k);
+  KalmanFilter KF = KalmanFilter(n,m, knumimus, k);
   KF.init(s);
 
-  std::cout << KF.set_measurement_noise();
-  std::cout << KF.set_measurement_matrix();
+  // std::cout << KF.set_measurement_noise();
+  // std::cout << KF.set_measurement_matrix();
 
   KF.set_initial(s);
 
