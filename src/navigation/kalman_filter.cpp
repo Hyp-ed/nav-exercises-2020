@@ -7,13 +7,12 @@ using namespace std;
 using Eigen::VectorXf;
 using Eigen::MatrixXf;
 
-void KalmanFilter::init(VectorXf x, MatrixXf A, MatrixXf P, MatrixXf Q, MatrixXf R){
+void KalmanFilter::init(VectorXf x){
     x_ = x;
-    A_ = A;
-    P_ = P;
-    Q_ = Q;
+    P_ = set_covariance();
+    Q_ = set_process_noise();
     H_ = set_measurement_matrix();
-    R_ = R;
+    R_ = set_measurement_noise();
     I_ = MatrixXf::Identity(n_, n_);
 
     //creating the init MatrixXf. Find a way to add this to the MatrixXf_lib as a method and not allow the user to assign a new value to it.
@@ -21,19 +20,20 @@ void KalmanFilter::init(VectorXf x, MatrixXf A, MatrixXf P, MatrixXf Q, MatrixXf
     //creating the init MatrixXf. Find a way to add this to the MatrixXf_lib as a method and not allow the user to assign a new value to it.
 }
 
-KalmanFilter::KalmanFilter(int n, int m, int k)
+KalmanFilter::KalmanFilter(int n, int m, int knumimus, int k)
     : n_(n)
     , m_(m)
-    , k_(k){
+    , k_(k)
+    , knumimus_(knumimus){
 
-    z_.resize(m);
+    z_.resize(m*knumimus);
     x_.resize(n);
     A_.resize(n,n);
     P_.resize(n,n);
     Q_.resize(n,n);
-    R_.resize(m,m);
+    R_.resize(m*knumimus,m*knumimus);
     I_.resize(n,n);
-    H_.resize(m,n);
+    H_.resize(m*knumimus,n);
 }
 
 void KalmanFilter::set_initial(VectorXf init){
@@ -42,15 +42,63 @@ void KalmanFilter::set_initial(VectorXf init){
 
 MatrixXf KalmanFilter::set_measurement_matrix()
 {
-    MatrixXf H(m_, n_);
+    MatrixXf H(m_*knumimus_, n_);
     H = MatrixXf::Zero(m_,n_);
 
     for(int i = 0; i < m_; i++)
     {
-        H(i, n_ - m_ + i) = 1;
+        for(int j = 0; j < knumimus_; j++){
+            H(i*knumimus_ + j, n_ - m_ + i) = 1;
+        }
     }
 
     return H;
+}
+
+MatrixXf KalmanFilter::set_covariance()
+{
+
+    MatrixXf P = MatrixXf::Constant(n_,n_,0.1);
+    P = P + MatrixXf::Identity(n_, n_);
+
+    return P;
+
+}
+
+// for now, Q will bethe same as P
+
+MatrixXf KalmanFilter::set_process_noise()
+{
+
+    MatrixXf Q = MatrixXf::Constant(n_,n_,0.1);
+    Q = Q + MatrixXf::Identity(n_, n_);
+
+    return Q;
+
+}
+
+MatrixXf KalmanFilter::set_measurement_noise()
+{
+
+    MatrixXf R = MatrixXf::Constant(m_*knumimus_,m_*knumimus_,0);
+
+    for(int i = 0; i < m_*knumimus_; i++)
+    {
+        for(int j = 0; j < m_*knumimus_; j++)
+        {
+            if (i == j)
+            {
+                R(i,j) = 1;
+            }
+            else if ((j-i) % knumimus_ == 0)
+            {
+                R(i,j) = 0.1;
+            }
+        }
+    }
+
+    return R;
+
 }
 
 VectorXf KalmanFilter::get_state(){
@@ -83,6 +131,19 @@ void KalmanFilter::filter(float dt, VectorXf s, VectorXf z){
     MatrixXf K(n_, n_);
     K = KalmanFilter::kalman_gain();
 
+    // std::cout << "K*(z - H*X): ";
+    // std::cout << '\n';
+    // std::cout << '\n';
+    // std::cout << K * (z - H_ * x_);
+    // std::cout << '\n';
+    // std::cout << '\n';
+    // std::cout << "est. state: ";
+    // std::cout << '\n';
+    // std::cout << '\n';
+    // std::cout << x_ + K * (z - H_ * x_);
+    // std::cout << '\n';
+    // std::cout << '\n';
+
     // KalmanFilter::get_data(); // manipulate sensor data and set measurement VectorXf
 
     // std::cout << x_;
@@ -94,13 +155,35 @@ void KalmanFilter::filter(float dt, VectorXf s, VectorXf z){
     // std::cout << H_ * x_;
     // std::cout << '\n';
     // std::cout << '\n';
-    // std::cout << z;
+    // std::cout << "K: ";
     // std::cout << '\n';
     // std::cout << '\n';
     // std::cout << K;
     // std::cout << '\n';
     // std::cout << '\n';
     // std::cout << P_;
+    // std::cout << '\n';
+    // std::cout << '\n';
+
+    // std::cout << x_;
+    // std::cout << '\n';
+    // std::cout << '\n';
+    // std::cout << "z - H*X: ";
+    // std::cout << '\n';
+    // std::cout << '\n';
+    // std::cout << z - H_ * x_;
+    // std::cout << '\n';
+    // std::cout << '\n';
+    // std::cout << "K: ";
+    // std::cout << '\n';
+    // std::cout << '\n';
+    // std::cout << K;
+    // std::cout << '\n';
+    // std::cout << '\n';
+    // std::cout << "K*(z - H_ * x_): ";
+    // std::cout << '\n';
+    // std::cout << '\n';
+    // std::cout << K*(z - H_ * x_);
     // std::cout << '\n';
     // std::cout << '\n';
 
@@ -143,8 +226,8 @@ void KalmanFilter::update_state_transition(float dt){
     {
         for(int j = i; j < n_; j++)
         {
-            if ((j - i) % m_ == 0){
-                A(i, j) = s((j - i)/m_);
+            if ((j - i) % (m_) == 0){
+                A(i, j) = s((j - i)/(m_));
             }
         }
     }

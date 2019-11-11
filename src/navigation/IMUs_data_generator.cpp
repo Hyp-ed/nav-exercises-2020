@@ -32,7 +32,7 @@ void IMU_faker_data::generator(float dt,
   float acc_y = 0;
   float acc_z = 0;
 
-  std::ofstream fout("fake_state_acc.txt");
+  std::ofstream fout("fake_state_acc_4.txt");
 
   // for y and z access only add noise to 0 acceleration
 

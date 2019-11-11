@@ -17,7 +17,7 @@ using Eigen::MatrixXf;
       * k : dimension of control   NOTE: will not be used in this implementation
       */
     
-      KalmanFilter(int n, int m, int k = 0);
+      KalmanFilter(int n, int m, int knumimus, int k = 0);
 
       /*
       * Constructor call for a kalman filter
@@ -28,7 +28,7 @@ using Eigen::MatrixXf;
       * H : Measurement Matrix
       * R : Sensor Noise Covariance
       */
-      void init(VectorXf x, MatrixXf A, MatrixXf P, MatrixXf Q, MatrixXf R);
+      void init(VectorXf x);
 
       // set initial state and covariance
       void set_initial(VectorXf init);  //! Add initial covariance matrix
@@ -71,12 +71,19 @@ using Eigen::MatrixXf;
       VectorXf get_measurement();
       // Setting Matrix H;
       MatrixXf set_measurement_matrix();
+      // initialize P matrix
+      MatrixXf set_covariance();
+      // initialize Q matrix
+      MatrixXf set_process_noise();
+      // initialize R matrix
+      MatrixXf set_measurement_noise();
 
 
 
       int n_;
       int m_;
       int k_;
+      int knumimus_;
 
       VectorXf x_;  // current state (n x 1)
       VectorXf z_;  // measurement (m x 1)
