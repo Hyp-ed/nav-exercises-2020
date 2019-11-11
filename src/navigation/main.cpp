@@ -2,6 +2,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <iomanip> 
+#include <string> 
 #include "kalman_filter.hpp"
 #include "IMUs_faker.hpp"
 
@@ -94,19 +95,37 @@ int main(){
 
   std::cout << "state: \n";
 
-  demo_IMU_data IMU_demo = demo_IMU_data("fake_state_acc.txt", m);
-  demo_IMU_data IMU_demo_2 = demo_IMU_data("fake_state_acc_2.txt", m);
-  demo_IMU_data IMU_demo_3 = demo_IMU_data("fake_state_acc_3.txt", m);
-  demo_IMU_data IMU_demo_4 = demo_IMU_data("fake_state_acc_4.txt", m);
+  string IMUs_files[knumimus] = { "fake_state_acc.txt",
+                                  "fake_state_acc_2.txt",
+                                  "fake_state_acc_3.txt",
+                                  "fake_state_acc_4.txt"};
 
-  vector< vector<float> > data1 = IMU_demo.get_data();
-  vector< vector<float> > data2 = IMU_demo_2.get_data();
-  vector< vector<float> > data3 = IMU_demo_3.get_data();
-  vector< vector<float> > data4 = IMU_demo_4.get_data();
+  // demo_IMU_data IMU_demo = demo_IMU_data("fake_state_acc.txt", m);
+  // demo_IMU_data IMU_demo_2 = demo_IMU_data("fake_state_acc_2.txt", m);
+  // demo_IMU_data IMU_demo_3 = demo_IMU_data("fake_state_acc_3.txt", m);
+  // demo_IMU_data IMU_demo_4 = demo_IMU_data("fake_state_acc_4.txt", m);
 
-  // for()
+  // vector< vector<float> > data1 = IMU_demo.get_data();
+  // vector< vector<float> > data2 = IMU_demo_2.get_data();
+  // vector< vector<float> > data3 = IMU_demo_3.get_data();
+  // vector< vector<float> > data4 = IMU_demo_4.get_data();
 
-  vector< vector<float> > IMUs[knumimus] = {data1, data2, data3, data4};
+  // vector< vector<float> > IMUs[knumimus] = {data1, data2, data3, data4};
+
+  // demo_IMU_data IMU_demo = demo_IMU_data("fake_state_acc.txt", m);
+
+  // vector< vector<float> > data4 = IMU_demo.get_data();
+
+  vector< vector<float> > IMUs[knumimus];
+
+  for(int k = 0; k < knumimus; k++)
+  {
+    demo_IMU_data IMU_demo = demo_IMU_data(IMUs_files[k], m);
+
+    vector< vector<float> > data = IMU_demo.get_data();
+
+    IMUs[k] = data;
+  }
 
   float dt; // 4 IMUs, this calculates the average interval time for nuw.
 
@@ -115,7 +134,7 @@ int main(){
   // using the size of the data1 imu for now. assumign all imus will print the
   // same amount of values which will not be true in reality.
 
-  for(std::size_t i=0; i < data1.size(); ++i)
+  for(std::size_t i=0; i < IMUs[0].size(); ++i)
   {
 
     for(int j = 0; j < m; j++)
