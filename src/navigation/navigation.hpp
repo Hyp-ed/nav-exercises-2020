@@ -67,6 +67,7 @@ namespace navigation {
       ImuDataPointArray sensor_readings_;
       DataPoint<NavigationVector> acceleration_;
       EstimateArray estimate_;
+      std::array<bool,data::Sensors::kNumImus> imu_reliable_; 
       // To calculate estimates
       // previous timestamp
       uint32_t prev_timestamp_;
