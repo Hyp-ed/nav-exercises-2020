@@ -100,6 +100,7 @@ void Navigation::m_zscore(OutlierType& data_array) {
   OutlierType medADarray;
   OutlierType meanADarray;
   OutlierType modZscore;
+  
 
   for (int i = 0; i < length; i++) { // Detecting faulty IMUs
     if (data_array[i] == 0) {
@@ -110,26 +111,36 @@ void Navigation::m_zscore(OutlierType& data_array) {
     }
   }
 
-
   std::sort(std::begin(data_array_copy), std::end(data_array_copy));
-  
-  /* Check for 6 and 8 imus first
-  int starting_index = 0;
-  for(int i = 0; i < length; i++) {
-    if (!(data_array_copy[i] == 0)) {
-      starting_index = i;
-    }
-  }
-  */
 
   if(unreliable_imus == data::Sensors::kNumImus / 2) {
-    median
-  }
-  if (length % 2 == 0) {
-    median = (data_array_copy[mid] + data_array_copy[mid - 1]) / 2;
+      OutlierType filtered_array;
+      int counter = 0;
+      for(int i = 0; i < length; i++) {
+          if (imu_reliable_[i]) {
+            filtered_array[counter] = data_array[i];
+            filtered_array[counter + 1] = data_array[i];
+            counter += 2;
+          }
+      }
+
+      std::sort(std::begin(filtered_array), std::end(filtered_array));
+      if (length % 2 == 0) {
+         median = (filtered_array[mid] + filtered_array[mid - 1]) / 2;
+      } else {
+           median = filtered_array[mid];
+        }
   } else {
-    median = data_array_copy[mid];
+      if (length % 2 == 0) {
+        median = (data_array_copy[mid] + data_array_copy[mid - 1]) / 2;
+    } else {
+        median = data_array_copy[mid];
+    }
   }
+  
+  
+
+  
   
   for (int i = 0; i < length; i++) {
     mean += data_array_copy[i];
@@ -158,8 +169,9 @@ void Navigation::m_zscore(OutlierType& data_array) {
       modZscore[i] = (data_arkNumImusray[i] - median) / (1.253314 * meanAD);
     }
   }
+  
   for (int i = 0; i < length ; i++) {
-    if(fabs(modZscore[i]) > 3.5) {
+    if(fabs(modZscore[i]) > 3.5 || data_array[i] == 0) {
       data_array[i] = median;
     }
   }
