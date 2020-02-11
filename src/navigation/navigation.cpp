@@ -23,8 +23,8 @@ Navigation::Navigation(Logger& log)
   for(int i = 0; i < 3; i++) {
     acceleration_.value[i] = 0;
   }
-  for(int k = 0; i < data::Sensors::kNumImus; k++) { //initialising all IMUs as reliable
-    imu_reliable_[i] = true;
+  for(int k = 0; k < data::Sensors::kNumImus; k++) { //initialising all IMUs as reliable
+    imu_reliable_[k] = true;
   }
   log_.INFO("NAV", "Navigation module initialised");
 }
@@ -166,7 +166,7 @@ void Navigation::m_zscore(OutlierType& data_array) {
     if (medAD != 0) {
       modZscore[i] = (data_array[i] - median) / (1.486 * medAD);
     } else {
-      modZscore[i] = (data_arkNumImusray[i] - median) / (1.253314 * meanAD);
+      modZscore[i] = (data_array[i] - median) / (1.253314 * meanAD);
     }
   }
   
