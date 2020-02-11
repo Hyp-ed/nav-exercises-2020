@@ -26,10 +26,6 @@ bin/navigation/navigation.o: src/navigation/navigation.cpp \
  lib/eigen-git-mirror/Eigen/src/Core/arch/Default/Half.h \
  lib/eigen-git-mirror/Eigen/src/Core/arch/Default/TypeCasting.h \
  lib/eigen-git-mirror/Eigen/src/Core/arch/Default/GenericPacketMathFunctionsFwd.h \
- lib/eigen-git-mirror/Eigen/src/Core/arch/SSE/PacketMath.h \
- lib/eigen-git-mirror/Eigen/src/Core/arch/SSE/TypeCasting.h \
- lib/eigen-git-mirror/Eigen/src/Core/arch/SSE/MathFunctions.h \
- lib/eigen-git-mirror/Eigen/src/Core/arch/SSE/Complex.h \
  lib/eigen-git-mirror/Eigen/src/Core/arch/Default/Settings.h \
  lib/eigen-git-mirror/Eigen/src/Core/arch/Default/GenericPacketMathFunctions.h \
  lib/eigen-git-mirror/Eigen/src/Core/functors/TernaryFunctors.h \
@@ -139,7 +135,6 @@ bin/navigation/navigation.o: src/navigation/navigation.cpp \
  lib/eigen-git-mirror/Eigen/src/LU/PartialPivLU.h \
  lib/eigen-git-mirror/Eigen/src/LU/Determinant.h \
  lib/eigen-git-mirror/Eigen/src/LU/InverseImpl.h \
- lib/eigen-git-mirror/Eigen/src/LU/arch/Inverse_SSE.h \
  lib/eigen-git-mirror/Eigen/Cholesky lib/eigen-git-mirror/Eigen/Jacobi \
  lib/eigen-git-mirror/Eigen/src/Jacobi/Jacobi.h \
  lib/eigen-git-mirror/Eigen/src/Cholesky/LLT.h \
@@ -173,7 +168,6 @@ bin/navigation/navigation.o: src/navigation/navigation.cpp \
  lib/eigen-git-mirror/Eigen/src/Geometry/ParametrizedLine.h \
  lib/eigen-git-mirror/Eigen/src/Geometry/AlignedBox.h \
  lib/eigen-git-mirror/Eigen/src/Geometry/Umeyama.h \
- lib/eigen-git-mirror/Eigen/src/Geometry/arch/Geometry_SSE.h \
  lib/eigen-git-mirror/Eigen/Eigenvalues \
  lib/eigen-git-mirror/Eigen/src/Eigenvalues/Tridiagonalization.h \
  lib/eigen-git-mirror/Eigen/src/Eigenvalues/RealSchur.h \
@@ -261,14 +255,6 @@ lib/eigen-git-mirror/Eigen/src/Core/arch/Default/Half.h:
 lib/eigen-git-mirror/Eigen/src/Core/arch/Default/TypeCasting.h:
 
 lib/eigen-git-mirror/Eigen/src/Core/arch/Default/GenericPacketMathFunctionsFwd.h:
-
-lib/eigen-git-mirror/Eigen/src/Core/arch/SSE/PacketMath.h:
-
-lib/eigen-git-mirror/Eigen/src/Core/arch/SSE/TypeCasting.h:
-
-lib/eigen-git-mirror/Eigen/src/Core/arch/SSE/MathFunctions.h:
-
-lib/eigen-git-mirror/Eigen/src/Core/arch/SSE/Complex.h:
 
 lib/eigen-git-mirror/Eigen/src/Core/arch/Default/Settings.h:
 
@@ -488,8 +474,6 @@ lib/eigen-git-mirror/Eigen/src/LU/Determinant.h:
 
 lib/eigen-git-mirror/Eigen/src/LU/InverseImpl.h:
 
-lib/eigen-git-mirror/Eigen/src/LU/arch/Inverse_SSE.h:
-
 lib/eigen-git-mirror/Eigen/Cholesky:
 
 lib/eigen-git-mirror/Eigen/Jacobi:
@@ -559,8 +543,6 @@ lib/eigen-git-mirror/Eigen/src/Geometry/ParametrizedLine.h:
 lib/eigen-git-mirror/Eigen/src/Geometry/AlignedBox.h:
 
 lib/eigen-git-mirror/Eigen/src/Geometry/Umeyama.h:
-
-lib/eigen-git-mirror/Eigen/src/Geometry/arch/Geometry_SSE.h:
 
 lib/eigen-git-mirror/Eigen/Eigenvalues:
 

@@ -24,6 +24,9 @@ Navigation::Navigation(Logger& log)
   for(int i = 0; i < 3; i++) {
     acceleration_.value[i] = 0;
   }
+  for(int k = 0; k < data::Sensors::kNumImus; k++) { //initialising all IMUs as reliable
+    imu_reliable_[k] = true;
+  }
   log_.INFO("NAV", "Navigation module initialised");
 }
 NavigationVector Navigation::getAcceleration() const
@@ -55,6 +58,7 @@ void Navigation::queryImus()
   for(int j = 0; j < 3; j++) {
     m_zscore(estimate_[j]);
   }
+
   // Arithmetic average of acceleration values
   for(int j = 0; j < 3; j++) {
     acceleration_.value[j] = 0;
@@ -88,7 +92,8 @@ void Navigation::m_zscore(OutlierType& data_array) {
   for(int i = 0 ; i < length ; i++) {
     data_array_copy[i] = data_array[i];
   }
-  int mid = (length / 2) - 1;
+  int mid = length / 2;
+  int unreliable_imus = 0;
   float median = 0;
   float mean   = 0;
   float medAD  = 0;
@@ -96,12 +101,48 @@ void Navigation::m_zscore(OutlierType& data_array) {
   OutlierType medADarray;
   OutlierType meanADarray;
   OutlierType modZscore;
-  std::sort(std::begin(data_array_copy), std::end(data_array_copy));
-  if (length % 2 == 0) {
-    median = (data_array_copy[mid] + data_array_copy[mid + 1]) / 2;
-  } else {
-    median = data_array_copy[mid + 1];
+  
+
+  for (int i = 0; i < length; i++) { // Detecting faulty IMUs
+    if (data_array[i] == 0) {
+      imu_reliable_[i] = false;
+      unreliable_imus++;
+    } else {
+      imu_reliable_[i] = true;
+    }
   }
+
+  std::sort(std::begin(data_array_copy), std::end(data_array_copy));
+
+  if(unreliable_imus == data::Sensors::kNumImus / 2) {
+      OutlierType filtered_array;
+      int counter = 0;
+      for(int i = 0; i < length; i++) {
+          if (imu_reliable_[i]) {
+            filtered_array[counter] = data_array[i];
+            filtered_array[counter + 1] = data_array[i];
+            counter += 2;
+          }
+      }
+
+      std::sort(std::begin(filtered_array), std::end(filtered_array));
+      if (length % 2 == 0) {
+         median = (filtered_array[mid] + filtered_array[mid - 1]) / 2;
+      } else {
+           median = filtered_array[mid];
+        }
+  } else {
+      if (length % 2 == 0) {
+        median = (data_array_copy[mid] + data_array_copy[mid - 1]) / 2;
+    } else {
+        median = data_array_copy[mid];
+    }
+  }
+  
+  
+
+  
+  
   for (int i = 0; i < length; i++) {
     mean += data_array_copy[i];
   }
@@ -111,9 +152,9 @@ void Navigation::m_zscore(OutlierType& data_array) {
   }
   std::sort(std::begin(medADarray), std::end(medADarray));
   if (length % 2 == 0) {
-    medAD = (medADarray[mid] + medADarray[mid + 1]) / 2;
+    medAD = (medADarray[mid] + medADarray[mid - 1]) / 2;
   } else {
-    medAD = medADarray[mid + 1];
+    medAD = medADarray[mid];
   }
   for (int i = 0; i < length; i++) {
     meanADarray[i] = fabs(data_array[i] - mean);
@@ -129,12 +170,14 @@ void Navigation::m_zscore(OutlierType& data_array) {
       modZscore[i] = (data_array[i] - median) / (1.253314 * meanAD);
     }
   }
+  
   for (int i = 0; i < length ; i++) {
-    if(fabs(modZscore[i]) > 3.5) {
+    if(fabs(modZscore[i]) > 3.5 || data_array[i] == 0) {
       data_array[i] = median;
     }
   }
 }
+
 void Navigation::set_init()
 {
   prev_timestamp_ = utils::Timer::getTimeMicros();
