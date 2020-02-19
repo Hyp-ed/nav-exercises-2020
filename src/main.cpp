@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
   log_system.DBG3("MAIN", "DBG3");
 
   // Initalise the threads here
-  Thread* sensors = new hyped::sensors::ImuManager(0, log_sensor);
+  Thread* sensors = new hyped::sensors::ImuManager(log_sensor);
   Thread* nav     = new hyped::navigation::Main(1, log_nav);
 
   // Start the threads here
