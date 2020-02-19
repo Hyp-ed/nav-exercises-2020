@@ -1,10 +1,10 @@
 /*
- * Author: Jack Horsburgh
+ * Author: Sensor Team
  * Organisation: HYPED
- * Date: 19/06/18
+ * Date:
  * Description: IMU manager for getting IMU data from around the pod and pushes to data struct
  *
- *    Copyright 2018 HYPED
+ *    Copyright 2019 HYPED
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
  *    You may obtain a copy of the License at
@@ -22,7 +22,7 @@
 #include "sensors/imu_manager.hpp"
 
 #include "sensors/imu.hpp"
-// #include "sensors/fake_imu.hpp" --NOT USED IN NAV EXERCISE
+// #include "sensors/fake_imu.hpp"
 #include "utils/timer.hpp"
 #include "utils/config.hpp"
 
@@ -33,22 +33,36 @@ using data::Sensors;
 using utils::System;
 
 namespace sensors {
-ImuManager::ImuManager(uint8_t id, Logger& log)
-    : ImuManagerInterface(id, log),
+ImuManager::ImuManager(Logger& log)
+    : Thread(log),
       sys_(System::getSystem()),
-      data_(Data::getInstance())
+      data_(Data::getInstance()),
+      imu_ {0}
 {
-  old_timestamp_ = utils::Timer::getTimeMicros();
+  if (!(sys_.fake_imu || sys_.fake_imu_fail)) {
+    utils::io::SPI::getInstance().setClock(utils::io::SPI::Clock::k4MHz);
 
-  utils::io::SPI::getInstance().setClock(utils::io::SPI::Clock::k1MHz);
-  std::array<uint32_t, data::Sensors::kNumImus> imu_chipselects = {47, 22, 27, 86};
-  for (int i = 0; i < data::Sensors::kNumImus; i++) {   // creates new real IMU objects
-    imu_[i] = new Imu(log, /*sys_.config->sensors.chip_select[i]*/ imu_chipselects[i], 0x08);
+    for (int i = 0; i < data::Sensors::kNumImus; i++) {   // creates new real IMU objects
+      imu_[i] = new Imu(log, sys_.config->sensors.chip_select[i], false);
+    }
   }
-
-  utils::io::SPI::getInstance().setClock(utils::io::SPI::Clock::k20MHz);
-
-  log_.INFO("IMU-MANAGER", "imu data has been initialised");
+  // else if (sys_.fake_imu_fail) {
+  //   for (int i = 0; i < data::Sensors::kNumImus; i++) {
+  //     // change params to fail in kAcccelerating or kNominalBraking states
+  //     imu_[i] = new FakeImuFromFile(log,
+  //                                   "data/in/acc_state.txt",
+  //                                   "data/in/decel_state.txt",
+  //                                   "data/in/decel_state.txt", (i%2 == 0), false);
+  //   }
+  // } else {
+  //   for (int i = 0; i < data::Sensors::kNumImus; i++) {
+  //     imu_[i] = new FakeImuFromFile(log,
+  //                                   "data/in/acc_state.txt",
+  //                                   "data/in/decel_state.txt",
+  //                                   "data/in/decel_state.txt", false, false);
+  //   }
+  // }
+  log_.INFO("IMU-MANAGER", "imu manager has been initialised");
 }
 
 void ImuManager::run()
@@ -56,7 +70,7 @@ void ImuManager::run()
   // collect real data while system is running
   while (sys_.running_) {
     for (int i = 0; i < data::Sensors::kNumImus; i++) {
-      imu_[i]->getData(&(sensors_imu_.value[i]));
+      if (imu_[i]) imu_[i]->getData(&(sensors_imu_.value[i]));
     }
     sensors_imu_.timestamp = utils::Timer::getTimeMicros();
     data_.setSensorsImuData(sensors_imu_);
